@@ -1,63 +1,107 @@
 <!DOCTYPE html>
-
-<head>
-    <style>
-        body {
-            font-family: Baskerville;
-            font-size: 1.5rem;
-        }
-    </style>
-</head>
-
 <html>
-    <div id="poem">
-    </div>
-</html>
+    <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond">
+        <style>
+            body {
+                font-family: EB Garamond, serif;
+            }
 
-<script>
-    var poem = "I wandered lonely as a cloud<br>That floats on high o'er vales and hills,<br>When all at once I saw a crowd,<br>A host, of golden daffodils;<br>Beside the lake, beneath the trees,<br>Fluttering and dancing in the breeze.<br><br>Continuous as the stars that shine<br>And twinkle on the milky way,<br>They stretched in never-ending line<br>Along the margin of a bay:<br>Ten thousand saw I at a glance,<br>Tossing their heads in sprightly dance.<br><br>The waves beside them danced; but they<br>Out-did the sparkling waves in glee:<br>A poet could not but be gay,<br>In such a jocund company:<br>I gazed—and gazed—but little thought<br>What wealth the show to me had brought:<br><br>For oft, when on my couch I lie<br>In vacant or in pensive mood,<br>They flash upon that inward eye<br>Which is the bliss of solitude;<br>And then my heart with pleasure fills,<br>And dances with the daffodils."
-    
-    // var lines = poem.split("<br>")
-    // var words = []
-    
-    // for (var i=0; i<lines.length; i++) {
-    //     words.push(...lines[i].split(" "))
-    // }
-    
-    var words = poem.split(" ");
-    
-    // console.log(words.length);
-    // console.log(words);
-    
-    // document.write(poem)
-    // document.write("<hr />")
-    // document.write(words.join(" "))
-    
-    // document.write("<hr />")
-    // document.write(words.join(" "))
-    
-    function swapFlutter(w, n=1) {
-        for (var i=0; i<n; i++) {
-            var randIndex1 = Math.floor(Math.random()*w.length)
-            var randIndex2 = Math.floor(Math.random()*w.length)
-    
-            var tmp = w[randIndex1]
-            w[randIndex1] = w[randIndex2]
-            w[randIndex2] = tmp
+            hr {
+                border: 1px solid #ccc;
+            }
+
+            div#poem {
+                font-size: 1.5rem;
+                margin-left: 1rem;
+            }
+        </style>
+        <title>Flutter: a poetry experiment by Advait</title>
+    </head>
+
+    <body>
+        <p>Flutter: a poetry experiment by <a href="https://advait.org">Advait</a></p>
+        <select id="poems" onchange="setPoem()">
+            <option value="0">Daffodils</option>
+            <option value="1">Slough</option>
+            <option value="2">Sonnet 18</option>
+            <option value="3">Woods</option>
+        </select>
+
+        <button onclick="reset()">Reset</button>
+        <button onclick="swapUpdate()">Swap</button>
+        <button onclick="swapUpdate(10)">Swap 10</button>
+        <button onclick="swapUpdate(100)">Swap 100</button>
+
+        <hr>
+        <div id="poem" contenteditable="true">
+        </div>
+    </body>
+
+    <script>
+        const allPoems = ["I wandered lonely as a cloud<br>That floats on high o'er vales and hills,<br>When all at once I saw a crowd,<br>A host, of golden daffodils;<br>Beside the lake, beneath the trees,<br>Fluttering and dancing in the breeze.<br><br>Continuous as the stars that shine<br>And twinkle on the milky way,<br>They stretched in never-ending line<br>Along the margin of a bay:<br>Ten thousand saw I at a glance,<br>Tossing their heads in sprightly dance.<br><br>The waves beside them danced; but they<br>Out-did the sparkling waves in glee:<br>A poet could not but be gay,<br>In such a jocund company:<br>I gazed—and gazed—but little thought<br>What wealth the show to me had brought:<br><br>For oft, when on my couch I lie<br>In vacant or in pensive mood,<br>They flash upon that inward eye<br>Which is the bliss of solitude;<br>And then my heart with pleasure fills,<br>And dances with the daffodils."
+        ,
+        "Come friendly bombs and fall on Slough!<br>It isn't fit for humans now,<br>There isn't grass to graze a cow.<br>Swarm over, Death!<br><br>Come, bombs and blow to smithereens<br>Those air-conditioned, bright canteens,<br>Tinned fruit, tinned meat, tinned milk, tinned beans,<br>Tinned minds, tinned breath.<br><br>Mess up the mess they call a town-<br>A house for ninety-seven down<br>And once a week a half a crown<br>For twenty years.<br><br>And get that man with double chin<br>Who'll always cheat and always win,<br>Who washes his repulsive skin<br>In women's tears:<br><br>And smash his desk of polished oak<br>And smash his hands so used to stroke<br>And stop his boring dirty joke<br>And make him yell.<br><br>But spare the bald young clerks who add<br>The profits of the stinking cad;<br>It's not their fault that they are mad,<br>They've tasted Hell.<br><br>It's not their fault they do not know<br>The birdsong from the radio,<br>It's not their fault they often go<br>To Maidenhead<br><br>And talk of sport and makes of cars<br>In various bogus-Tudor bars<br>And daren't look up and see the stars<br>But belch instead.<br><br>In labour-saving homes, with care<br>Their wives frizz out peroxide hair<br>And dry it in synthetic air<br>And paint their nails.<br><br>Come, friendly bombs and fall on Slough<br>To get it ready for the plough.<br>The cabbages are coming now;<br>The earth exhales."
+        ,
+        "Shall I compare thee to a summer’s day?<br>Thou art more lovely and more temperate:<br>Rough winds do shake the darling buds of May,<br>And summer’s lease hath all too short a date;<br>Sometime too hot the eye of heaven shines,<br>And often is his gold complexion dimm'd;<br>And every fair from fair sometime declines,<br>By chance or nature’s changing course untrimm'd;<br>But thy eternal summer shall not fade,<br>Nor lose possession of that fair thou ow’st;<br>Nor shall death brag thou wander’st in his shade,<br>When in eternal lines to time thou grow’st:<br>   So long as men can breathe or eyes can see,<br>   So long lives this, and this gives life to thee."
+        ,
+        "Whose woods these are I think I know.<br>His house is in the village though;<br>He will not see me stopping here<br>To watch his woods fill up with snow.<br><br>My little horse must think it queer<br>To stop without a farmhouse near<br>Between the woods and frozen lake<br>The darkest evening of the year.<br><br>He gives his harness bells a shake<br>To ask if there is some mistake.<br>The only other sound’s the sweep<br>Of easy wind and downy flake.<br><br>The woods are lovely, dark and deep,<br>But I have promises to keep,<br>And miles to go before I sleep,<br>And miles to go before I sleep."]
+        
+        // var lines = poem.split("<br>")
+        // var words = []
+        
+        // for (var i=0; i<lines.length; i++) {
+        //     words.push(...lines[i].split(" "))
+        // }
+        
+        let poem = allPoems[0]
+        let words = poem.split(" ")
+        
+        // console.log(words.length);
+        // console.log(words);
+        
+        // document.write(poem)
+        // document.write("<hr />")
+        // document.write(words.join(" "))
+        
+        // document.write("<hr />")
+        // document.write(words.join(" "))
+        
+        function swapFlutter(w, n=1) {
+            for (let i=0; i<n; i++) {
+                let randIndex1 = Math.floor(Math.random()*w.length)
+                let randIndex2 = Math.floor(Math.random()*w.length)
+        
+                let tmp = w[randIndex1]
+                w[randIndex1] = w[randIndex2]
+                w[randIndex2] = tmp
+            }
+            return w
         }
-        return w
-    }
-
-    poemDiv = document.getElementById("poem")
-    function swapOnceAndUpdate() {
-        words = swapFlutter(words)
-        poemDiv.innerHTML = words.join(" ")
-    }
-
-    // words = swapFlutter(words, 10)
-    // poemDiv.innerHTML = words.join(" ")
-
-    var intervalID = setInterval(swapOnceAndUpdate, 5000)
     
-</script>
+        let poemDiv = document.getElementById("poem")
+        
+        function swapUpdate(n=1) {
+            words = poemDiv.innerHTML.split(" ")
+            words = swapFlutter(words,n)
+            poemDiv.innerHTML = words.join(" ")
+        }
+    
+        function reset() {
+            words = poem.split(" ")
+            poemDiv.innerHTML = words.join(" ")
+        }
+    
+        let poemSetter = document.getElementById("poems")
+
+        function setPoem() {
+            poem = allPoems[poemSetter.value]
+            reset()
+        }
+    
+        // words = swapFlutter(words, 10)
+        poemDiv.innerHTML = words.join(" ")
+        //var intervalID = setInterval(swapOnceAndUpdate, 5000)
+    </script>
+</html>
     
