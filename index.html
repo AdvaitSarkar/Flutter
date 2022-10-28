@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="stopwords-en.js"></script>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond">
         <style>
             body {
@@ -32,6 +33,11 @@
         <button onclick="swapUpdate()">Swap</button>
         <button onclick="swapUpdate(10)">Swap 10</button>
         <button onclick="swapUpdate(100)">Swap 100</button>
+
+        <input type="checkbox" id="stopwords" name="stopwords" checked>
+        <label for="stopwords">Skip stopwords</label>
+        <input type="checkbox" id="keepEnds" name="keepEnds" checked>
+        <label for="keepEnds">Keep line ends</label>
 
         <hr>
         <div id="poem" contenteditable="true">
@@ -67,14 +73,30 @@
         // document.write("<hr />")
         // document.write(words.join(" "))
         
+        // console.log(stopwords)
+        let skipStopwords = true
+        let keepEnds = true
+
         function swapFlutter(w, n=1) {
             for (let i=0; i<n; i++) {
                 let randIndex1 = Math.floor(Math.random()*w.length)
                 let randIndex2 = Math.floor(Math.random()*w.length)
-        
-                let tmp = w[randIndex1]
-                w[randIndex1] = w[randIndex2]
-                w[randIndex2] = tmp
+
+                // console.log("Considering",w[randIndex1],w[randIndex2])
+                // console.log(w[randIndex1].toLowerCase() in stopwords)
+
+                let shouldSkip = (skipStopwords && (stopwords.includes(w[randIndex1].toLowerCase()) || stopwords.includes(w[randIndex2].toLowerCase())))
+                              || (keepEnds && (w[randIndex1].includes("<br>") || w[randIndex2].includes("<br>")))
+                
+                //   console.log("Skipped",shouldSkip)
+                if (shouldSkip) {
+                    i--
+                }
+                else {
+                    let tmp = w[randIndex1]
+                    w[randIndex1] = w[randIndex2]
+                    w[randIndex2] = tmp
+                }
             }
             return w
         }
@@ -82,6 +104,9 @@
         let poemDiv = document.getElementById("poem")
         
         function swapUpdate(n=1) {
+            skipStopwords = document.getElementById("stopwords").checked
+            keepEnds = document.getElementById("keepEnds").checked
+            
             words = poemDiv.innerHTML.split(" ")
             words = swapFlutter(words,n)
             poemDiv.innerHTML = words.join(" ")
